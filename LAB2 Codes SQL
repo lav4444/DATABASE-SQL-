@@ -1,0 +1,137 @@
+1.ZAD
+Ispisati podatke o praznim predmetnim grupama iz akademske godine 2019./2020. ( ispisivati: naziv predmeta, oznaku grupe, akademsku godinu i šifru 
+nastavnika). Prazne predmetne grupe su one predmetne grupe kojima (te akademske godine) nije bio pridijeljen niti jedan student. U obzir uzeti samo 
+one predmete kojima te akademske godine nije bio pridijeljen niti jedan drugi nastavnik.
+
+Primjer rezultata:
+
+nazPredmet	ozngrupa	akgodina	sifnastavnik
+Logička algebra	D-B2	2019	570
+Logička algebra	D-B3	2019	570
+Vještine komuniciranja	D-A5	2019	480
+...	...	...	...
+ 
+
+Tumačenje prvog retka rezultata:  akademske godine 2019./2020. je definirano da grupi "D-B2" nastavnik sa šifrom 570 predaje predmet "Logička algebra", 
+ali niti jedan student nije bio raspoređen u tu grupu. Također, Logičku algebru je te akademske godine predavao samo nastavnik sa šifrom 570.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+2.ZAD
+Potrebno je dodati novu organizacijsku jedinicu "Republika Hrvatska" sa šifrom 1 (nema nadređenu organizacijsku jedinicu).  Zatim postaviti Republiku 
+Hrvatsku kao nadređenu svim organizacijskim jedinicama koje dosad nisu imale nadređenu organizacijsku jedinicu (osim same Republike Hrvatske).
+
+Općenita napomena: višestruke SQL naredbe odvajati znakom: ";".
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+3.ZAD
+Za svaki predmet i županiju ispišite šifru predmeta, šifru županije i prosječnu ocjenu (stupac nazvati prosjek_ocjena) koju su iz tog predmeta ostvarili 
+svi studenti koji žive u toj županiji. Ispisati samo zapise za koje su svi studenti koji su upisali predmet dobili barem ocjenu 3, a nitko nije dobio 
+više od 4. Prosječnu je ocjenu potrebno zaokružiti na dvije decimalne znamenke.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+4.ZAD
+Za svaku A-dvoranu čiji je kapacitet manji ili jednak kapacitetu najmanje D-dvorane (tj. D-dvorane s najmanjim kapacitetom) ispisati oznaku dvorane, 
+kapacitet i broj različitih predmeta (stupac nazvati razlicitiPredmeti) iz kojih se u toj dvorani odvija nastava u akademskoj godini 2019./2020. 
+(uključiti u ispis i dvorane u kojima se te godine nastava uopće ne drži).
+
+Zapise poredati silazno po broju predmeta, a one s istim brojem predmeta prema oznaci dvorane uzlazno.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+5.ZAD
+Za zadanu relacijsku shemu STUDBOR={jmbag, ime, prezime, oznakaDvorane, prosjekBoravka} napisati naredbu kojom će se napraviti relacija studBor(STUDBOR). 
+Tipovi podataka neka budu sljedeći:
+
+jmbag - VARCHAR(10)
+ime - VARCHAR(25)
+prezime  - VARCHAR(25)
+oznakaDvorana - VARCHAR(5)
+prosjekBoravka - INTERVAL
+
+U relaciju studBor upisati studente koji su u veljači u dvorani A204 u prosjeku boravili više od 2 sata. (Boravak u veljači znači da su studenti ušli u 
+odgovarajuću dvoranu u veljači i iz iste izašli u veljači).
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+6.ZAD
+Ispisati podatke o praznim predmetnim grupama iz akademske godine 2020./2021. ( ispisati: naziv predmeta, oznaku grupe, akademsku godinu i šifru 
+nastavnika). Prazne predmetne grupe su one predmetne grupe kojima (te akademske godine) nije bio pridijeljen niti jedan student. U obzir uzeti samo one 
+predmete kojima je te akademske godine bilo pridijeljeno više od jednog nastavnika.
+
+Primjer rezultata:
+
+nazPredmet	ozngrupa	akgodina	sifnastavnik
+Logička algebra	D-B2	2020	570
+Logička algebra	D-B3	2020	590
+Vještine komuniciranja	D-A5	2020	480
+...	...	...	...
+ 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+7.ZAD
+Organizacijskim jedinicama direktno podređenim Zavodu za visoki napon i energetiku (šifra 100005) kojima naziv počinje s "Grupa" promijeniti naziv tako 
+da umjesto s "Grupa" počinje sa "Zavod" (npr. "Grupa za električna postrojenja" je potrebno promijeniti u "Zavod za električna postrojenja").
+
+Organizacijska jedinica O1 je direktno podređena organizacijskoj jedinici O2 ako je u hijerarhijskom stablu čvor O2 roditelj čvoru O1.
+Npr.
+O2
+ |- O1
+   |-O5
+   |-O6
+ |- O3
+
+Organizacijske jedinice O1 i O3 su direktno podređene organizacijskoj jedinici O2, ali organizacijska jedinica O5 nije direktno podređena organizacijskoj 
+jedinici O2 (već O1).
+
+Općenita napomena: višestruke SQL naredbe odvajati znakom: ";".
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+8.ZAD
+Za svakog studenta kojemu je rođendan u ovoj godini već prošao (ne računa se današnji dan, odnosno studentima koji su rođeni na današnji dan rođendan 
+nije prošao) ispisati JMBAG, ime, prezime i datum rođenja, ali samo ako su mu nepoznati mjesto rođenja ili stanovanja (ili oboje).
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+9.ZAD
+Za svakog nastavnika čije ime počinje slovom "A" ili slovom "M" a kojem je radni odnos započeo 2001. godine od siječnja do lipnja te godine (uključujući 
+lipanj), ispisati šifru nastavnika i inicijale imena i prezimena (u formatu I.P.).
+
+Za one nastavnike koji su predavali predmete u akademskoj godini 2021./2022. dodatno ispisati oznake grupa kojima su nastavnici predavali predmete, inače 
+ispisati NULL vrijednost.
+
+Dodatno, ispisati i naziv predmeta, ako se predmet predavao više od 5 sati tjedno, u suprotnom ispisati NULL vrijednost.
+
+Primjer rezultata:
+
+sifNastavnik	inicijali	oznGrupa	naziv
+392	D.B.	NULL	NULL
+720	D.S.	A-I	Fizika 2
+720	D.S.	A-K	Fizika 2
+723	K.G.	C-A1	NULL
+723	K.G.	C-A2	NULL
+...	...	...	...
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+10.ZAD
+Ispisati JMBAG, prezime i ime studenata koji stanuju u istoj županiji u kojoj su i rođeni, a prošle kalendarske godine su iz bilo kojeg ispita dobili 
+ocjenu 5. Pored imena i prezimena studenta ispisati naziv mjesta rođenja (stupac nazvati mjestoRod) i naziv mjesta stanovanja (stupac nazvati mjestoStan).
+Upit mora biti neovisan o trenutku izvođenja.
+U rezultatu se ne smiju pojavljivati jednake n-torke (duplikati). Poredak n-torki u rezultatu nije bitan.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+11.ZAD
+Ispisati jmbag, ime i prezime svih studenata rođenih 1990. ili 1991. godine. Dodatno, za svakog takvog studenta ispisati nazive predmeta koje je upisao u 
+akademskoj godini 2021./2022. Ako student nema upisanih predmeta u akademskoj godini 2021./2022., za naziv predmeta ispisati NULL vrijednost. 
+Pretpostavlja se da za svaki upisani predmet postoji odgovarajući zapis u relaciji predmet.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+12.ZAD
+Ispisati nazive predmeta (samo jednom) koji imaju paran broj znakova u nazivu i koje je barem jedan student upisao akademske godine 2021./2022.
