@@ -21,6 +21,14 @@ Potrebno je dodati novu organizacijsku jedinicu "Republika Hrvatska" sa šifrom 
 Hrvatsku kao nadređenu svim organizacijskim jedinicama koje dosad nisu imale nadređenu organizacijsku jedinicu (osim same Republike Hrvatske).
 
 Općenita napomena: višestruke SQL naredbe odvajati znakom: ";".
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+INSERT INTO orgjed
+	VALUES(1, 'Republika Hrvatska', NULL);   
+    
+UPDATE orgjed
+	SET sifnadorgjed = 1
+	WHERE sifnadorgjed IS NULL AND siforgjed != 1;
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,6 +36,17 @@ Općenita napomena: višestruke SQL naredbe odvajati znakom: ";".
 Za svaki predmet i županiju ispišite šifru predmeta, šifru županije i prosječnu ocjenu (stupac nazvati prosjek_ocjena) koju su iz tog predmeta ostvarili 
 svi studenti koji žive u toj županiji. Ispisati samo zapise za koje su svi studenti koji su upisali predmet dobili barem ocjenu 3, a nitko nije dobio 
 više od 4. Prosječnu je ocjenu potrebno zaokružiti na dvije decimalne znamenke.
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT ispit.sifpredmet, mjesto.sifzupanija, 
+	ROUND(AVG(ispit.ocjena), 2) AS prosjek_ocjena
+	FROM ispit 
+		JOIN student
+			ON ispit.jmbag = student.jmbag
+		JOIN mjesto ON mjesto.pbr = student.pbrstanstudent
+	GROUP BY ispit.sifpredmet, mjesto.sifzupanija
+	HAVING MIN(ispit.ocjena) >= 3 AND MAX(ispit.ocjena) <= 4;
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,6 +57,23 @@ kapacitet i broj različitih predmeta (stupac nazvati razlicitiPredmeti) iz koji
 
 Zapise poredati silazno po broju predmeta, a one s istim brojem predmeta prema oznaci dvorane uzlazno.
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT dvorana.ozndvorana, dvorana.kapacitet, 
+	COUNT(distinct predmetgrupa.sifpredmet) AS razlicitiPredmeti
+	FROM predmetgrupa
+		RIGHT JOIN dvorana
+			ON dvorana.ozndvorana = predmetgrupa.ozndvorana
+				AND predmetgrupa.akgodina = 2019
+	
+	WHERE dvorana.ozndvorana LIKE 'A%' AND dvorana.kapacitet <= 
+(
+SELECT MIN(kapacitet) 
+	FROM dvorana JOIN predmetgrupa ON dvorana.ozndvorana = predmetgrupa.ozndvorana
+	WHERE dvorana.ozndvorana LIKE 'D%' AND predmetgrupa.akgodina = 2019
+)
+	GROUP BY dvorana.ozndvorana, dvorana.kapacitet
+	ORDER BY razlicitiPredmeti DESC, dvorana.ozndvorana ASC;
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 5.ZAD
@@ -53,6 +89,28 @@ prosjekBoravka - INTERVAL
 U relaciju studBor upisati studente koji su u veljači u dvorani A204 u prosjeku boravili više od 2 sata. (Boravak u veljači znači da su studenti ušli u 
 odgovarajuću dvoranu u veljači i iz iste izašli u veljači).
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+CREATE TABLE STUDBOR(
+	jmbag VARCHAR(10),
+    ime VARCHAR(25),
+    prezime VARCHAR(25),
+    oznakaDvorana VARCHAR(5),
+    prosjekBoravka INTERVAL
+
+);
+
+INSERT INTO STUDBOR (jmbag, ime, prezime, oznakaDvorana, prosjekBoravka)
+	SELECT student.jmbag, student.imestudent, student.prezimestudent, 
+		evidencijaboravka.ozndvorana, 
+		AVG(datumvrijemekraj - datumvrijemepoc) AS prosjekBoravka
+        FROM student FULL JOIN evidencijaboravka ON student.jmbag=evidencijaboravka.jmbag
+        WHERE evidencijaboravka.ozndvorana = 'A204' 
+			AND EXTRACT(MONTH FROM datumvrijemepoc) = 2 
+			AND EXTRACT(MONTH FROM datumvrijemekraj) = 2
+		GROUP BY student.jmbag, student.imestudent, student.prezimestudent, 
+		evidencijaboravka.ozndvorana
+		HAVING AVG(datumvrijemekraj - datumvrijemepoc) > INTERVAL '2 hours';
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 6.ZAD
@@ -67,7 +125,9 @@ Logička algebra	D-B2	2020	570
 Logička algebra	D-B3	2020	590
 Vještine komuniciranja	D-A5	2020	480
 ...	...	...	...
- 
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -88,12 +148,22 @@ jedinici O2 (već O1).
 
 Općenita napomena: višestruke SQL naredbe odvajati znakom: ";".
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+UPDATE orgjed
+	SET nazorgjed = CONCAT('Zavod', SUBSTRING(nazorgjed, 6, CHAR_LENGTH(nazorgjed)-5))
+	WHERE sifnadorgjed = 100005 AND SUBSTRING(nazorgjed, 1, 5) = 'Grupa';
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 8.ZAD
 Za svakog studenta kojemu je rođendan u ovoj godini već prošao (ne računa se današnji dan, odnosno studentima koji su rođeni na današnji dan rođendan 
 nije prošao) ispisati JMBAG, ime, prezime i datum rođenja, ali samo ako su mu nepoznati mjesto rođenja ili stanovanja (ili oboje).
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT jmbag, imestudent, prezimestudent, datumrod
+	FROM student
+    WHERE (pbrstanstudent IS NULL OR pbrrodstudent IS NULL) AND EXTRACT(doy FROM datumrod)<EXTRACT(doy FROM CURRENT_TIMESTAMP);
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 9.ZAD
@@ -115,6 +185,22 @@ sifNastavnik	inicijali	oznGrupa	naziv
 723	K.G.	C-A2	NULL
 ...	...	...	...
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT
+	nastavnik.sifnastavnik, 
+	CONCAT(SUBSTRING(imenastavnik, 1, 1), '.', SUBSTRING(prezimenastavnik, 1, 1), '.')
+		AS inicijali,
+	ozngrupa, nazpredmet AS naziv
+	FROM nastavnik 
+		LEFT JOIN predmetgrupa 
+			ON nastavnik.sifnastavnik = predmetgrupa.sifnastavnik
+				AND akgodina = 2021
+		LEFT JOIN predmet 
+			ON predmet.sifpredmet = predmetgrupa.sifpredmet
+				AND ukbrsatitjedno > 5
+	WHERE (SUBSTRING(imenastavnik, 1, 1)='A' OR SUBSTRING(imenastavnik, 1, 1)='M')
+		AND EXTRACT(YEAR FROM datumzaposlenod) = 2001 AND (EXTRACT(MONTH FROM datumzaposlenod) BETWEEN 1 AND 6);
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -124,6 +210,19 @@ ocjenu 5. Pored imena i prezimena studenta ispisati naziv mjesta rođenja (stupa
 Upit mora biti neovisan o trenutku izvođenja.
 U rezultatu se ne smiju pojavljivati jednake n-torke (duplikati). Poredak n-torki u rezultatu nije bitan.
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT DISTINCT student.jmbag, prezimestudent, imestudent, MR.nazmjesto AS mjestoRod, MS.nazmjesto AS mjestoStan
+	FROM student 
+		LEFT JOIN mjesto MR 
+			ON student.pbrrodstudent = MR.pbr 
+		LEFT JOIN mjesto MS
+			ON student.pbrstanstudent = MS.pbr 
+		LEFT JOIN ispit 
+			ON ispit.jmbag = student.jmbag 
+		LEFT JOIN zupanija zr ON zr.sifzupanija = MR.sifzupanija
+		LEFT JOIN zupanija zs ON zs.sifzupanija = MS.sifzupanija
+	WHERE zr = zs AND EXTRACT(YEAR FROM datumispit) = EXTRACT(YEAR FROM CURRENT_TIMESTAMP)-1 AND ocjena = 5;
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 11.ZAD
@@ -131,7 +230,26 @@ Ispisati jmbag, ime i prezime svih studenata rođenih 1990. ili 1991. godine. Do
 akademskoj godini 2021./2022. Ako student nema upisanih predmeta u akademskoj godini 2021./2022., za naziv predmeta ispisati NULL vrijednost. 
 Pretpostavlja se da za svaki upisani predmet postoji odgovarajući zapis u relaciji predmet.
 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT student.jmbag, imestudent, prezimestudent, nazpredmet
+	FROM student 
+		LEFT JOIN upisanpredmet
+			ON student.jmbag = upisanpredmet.jmbag
+				AND akgodina = 2021
+		LEFT JOIN predmet
+			ON upisanpredmet.sifpredmet = predmet.sifpredmet
+	WHERE EXTRACT(YEAR FROM datumrod) IN (1990, 1991);
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 12.ZAD
 Ispisati nazive predmeta (samo jednom) koji imaju paran broj znakova u nazivu i koje je barem jedan student upisao akademske godine 2021./2022.
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT DISTINCT
+	nazpredmet
+    FROM upisanpredmet LEFT JOIN predmet 
+    	ON upisanpredmet.sifpredmet = predmet.sifpredmet
+    WHERE akgodina = 2021 AND CHAR_LENGTH(nazpredmet)%2=0
+	GROUP BY nazpredmet;
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
