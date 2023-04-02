@@ -10,6 +10,28 @@ Logička algebra	D-B2	2019	570
 Logička algebra	D-B3	2019	570
 Vještine komuniciranja	D-A5	2019	480
 ...	...	...	...
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT predmet.nazpredmet, predmetgrupa.ozngrupa, predmetgrupa.akgodina,
+	predmetgrupa.sifnastavnik
+	FROM predmet 
+		RIGHT JOIN predmetgrupa 
+			ON predmet.sifpredmet = predmetgrupa.sifpredmet
+        LEFT JOIN upisanpredmet 
+			ON upisanpredmet.ozngrupa = predmetgrupa.ozngrupa 
+            	AND upisanpredmet.sifpredmet = predmet.sifpredmet 
+				AND upisanpredmet.akgodina= predmetgrupa.akgodina
+	WHERE predmetgrupa.akgodina = 2019 AND jmbag IS NULL 
+		AND predmetgrupa.sifpredmet IN (SELECT sifpredmet 
+                                                 from predmetgrupa
+                                                 where akgodina=2019
+                                                 group by sifpredmet
+                                                 having count(DISTINCT sifnastavnik)<2)
+	GROUP BY predmet.nazpredmet, predmetgrupa.ozngrupa, predmetgrupa.akgodina, 
+	predmetgrupa.sifnastavnik;
+
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
  
 
 Tumačenje prvog retka rezultata:  akademske godine 2019./2020. je definirano da grupi "D-B2" nastavnik sa šifrom 570 predaje predmet "Logička algebra", 
@@ -127,6 +149,23 @@ Vještine komuniciranja	D-A5	2020	480
 ...	...	...	...
 
 | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT predmet.nazpredmet, predmetgrupa.ozngrupa, predmetgrupa.akgodina,
+	predmetgrupa.sifnastavnik
+	FROM predmet 
+		RIGHT JOIN predmetgrupa 
+			ON predmet.sifpredmet = predmetgrupa.sifpredmet
+        LEFT JOIN upisanpredmet 
+			ON upisanpredmet.ozngrupa = predmetgrupa.ozngrupa 
+            	AND upisanpredmet.sifpredmet = predmet.sifpredmet 
+				AND upisanpredmet.akgodina= predmetgrupa.akgodina
+	WHERE predmetgrupa.akgodina = 2020 AND jmbag IS NULL 
+		AND predmetgrupa.sifpredmet IN (SELECT sifpredmet 
+                                                 from predmetgrupa
+                                                 where akgodina=2020
+                                                 group by sifpredmet
+                                                 having count(DISTINCT sifnastavnik)>=2)
+	GROUP BY predmet.nazpredmet, predmetgrupa.ozngrupa, predmetgrupa.akgodina, 
+	predmetgrupa.sifnastavnik;
 | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
 
 
