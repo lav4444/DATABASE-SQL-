@@ -1,1 +1,264 @@
+1.ZAD
+1. Napraviti virtualnu relaciju stanBr sa shemom relacije STANBR = pbrstan, broj koja će omogućiti pregled broja studenata koji su položili barem 
+jedan ispit čiji je datum roka bio u 2022. kalendarskoj godini po poštanskom broju stanovanja.
 
+Primjer rezultata (podaci su ilustrativni i ne moraju odgovarati stvarnima):
+
+SELECT * FROM stanBr;
+
+2. Napraviti virtualnu relaciju mjestoBr sa shemom relacije MJESTOBR = nazmjesto, broj koja će po SVIM mjestima omogućiti pregled broja studenata 
+koji su položili barem jedan ispit čiji je datum roka bio u 2022. kalendarskoj godini koji stanuju u tom mjestu. Uključiti i studente čije mjesto 
+stanovanja nije poznato.
+
+Virtualnu relaciju mjestoBr obavezno napraviti pomoću relacije stanBr.
+
+Primjer rezultata (podaci su ilustrativni i ne moraju odgovarati stvarnima):
+
+SELECT * FROM mjestoBr;
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+CREATE VIEW stanBr(pbrstan, broj) AS
+	SELECT pBrStanStudent AS pbrstan, COUNT(DISTINCT ispit.JMBAG) AS broj
+		FROM ispit
+			NATURAL JOIN student
+				
+		WHERE EXTRACT(YEAR FROM datumIspit)=2022
+        	AND ocjena > 1
+		GROUP BY pBrStanStudent;
+        
+CREATE VIEW mjestoBr(nazmjesto, broj) AS	
+	SELECT nazMjesto, broj
+		FROM mjesto
+			FULL OUTER JOIN stanBr
+				ON mjesto.pBr = stanBr.pbrStan;
+                
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+2.ZAD
+Svim nastavnicima čiji je koeficijent manji od prosječnog smanjiti koeficijent za 10%.
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+UPDATE nastavnik
+SET koef = koef * 0.9
+WHERE koef<(SELECT AVG(koef) 
+           		FROM nastavnik);
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+3.ZAD
+Napraviti 2 virtualne relacije:
+
+1. Napraviti virtualnu relaciju stanBr3 sa shemom relacije STANBR3 = pbrstan, broj3 koja će omogućiti pregled broja studenata koji su s ocjenom 3 
+položili ispit čiji je datum roka bio u 2022. kalendarskoj godini po poštanskom broju stanovanja.
+
+Primjer rezultata (podaci su ilustrativni i ne moraju odgovarati stvarnima):
+
+SELECT * FROM stanBr3;
+
+2. Napraviti virtualnu relaciju mjestoBr3 sa shemom relacije MJESTOBR3 = nazmjesto, broj3 koja će po SVIM mjestima omogućiti pregled broja studenata koji 
+su s ocjenom 3 položili ispit čiji datum roka bio u 2022. kalendarskoj godini i koji stanuju u tom mjestu. Uključiti i studente čije mjesto stanovanja 
+nije poznato (pogledajte primjer).
+
+Virtualnu relaciju mjestoBr3 obavezno napraviti pomoću relacije stanBr3.
+
+Primjer rezultata (podaci su ilustrativni i ne moraju odgovarati stvarnima):
+
+SELECT * FROM mjestoBr3;
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+CREATE VIEW stanBr3(pbrstan, broj3) AS
+	SELECT pBrStanStudent AS pbrstan, COUNT(DISTINCT ispit.JMBAG) AS broj3
+		FROM ispit
+			NATURAL JOIN student
+				
+		WHERE EXTRACT(YEAR FROM datumIspit)=2022
+        	AND ocjena = 3
+		GROUP BY pBrStanStudent;
+        
+CREATE VIEW mjestoBr3(nazmjesto, broj3) AS	
+	SELECT nazMjesto, broj3
+		FROM mjesto
+			FULL OUTER JOIN stanBr3
+				ON mjesto.pBr = stanBr3.pbrStan;
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+4.ZAD
+Primarni ključ u relaciji predmetGrupa je skup atributa: {sifPredmet, akGodina, oznGrupa}. Jednom SQL naredbom osigurajte entitetski integritet i 
+integritet ključa u toj relaciji.
+
+Osigurati entitetski integritet i integritet ključa u relaciji nastavnik. 
+
+Osigurati referencijski integritet među relacijama predmetGrupa i nastavnik.
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+ALTER TABLE predmetGrupa ADD CONSTRAINT predGrupaPK PRIMARY KEY (sifPredmet, akGodina, oznGrupa);
+
+ALTER TABLE nastavnik ADD CONSTRAINT nastavnikPK PRIMARY KEY (sifNastavnik);
+
+ALTER TABLE predmetGrupa ADD CONSTRAINT lalala FOREIGN KEY (sifNastavnik) REFERENCES nastavnik(sifNastavnik);
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+5.ZAD
+Svim predmetima čiji je broj sati tjedno manji od prosjeka smanjiti broj ECTS bodova za 20%. Nove ECTS bodove zaokružiti na cijeli broj.
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+UPDATE predmet
+SET ECTSBod = ROUND(ECTSBod * 0.8, 0)
+WHERE ukBrSatiTjedno<(SELECT AVG(ukBrSatiTjedno) 
+           		FROM predmet);
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+6.ZAD
+Ispisati naziv predmeta i oznaku grupa kojima je taj predmet bio predavan akademske godine 2022./2023. Ako je nekoj grupi taj predmet predavao nastavnik 
+koji više nije u radnom odnosu, dodatno ispisati njegovo ime i prezime. U suprotnom, za ime i prezime nastavnika ispisati NULL vrijednosti. Smatra se da 
+je nastavnik u radnom odnosu ako mu nije evidentiran datum prestanka zaposlenja. Uzeti u obzir samo grupe kojima oznaka počinje slovom "A".
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT predmet.nazPredmet AS naziv, predmetGrupa.oznGrupa, nastavnik.imeNastavnik AS ime, nastavnik.prezimeNastavnik AS prezime
+	FROM predmet 
+    	NATURAL JOIN predmetGrupa
+        LEFT JOIN nastavnik
+        	ON predmetGrupa.sifNastavnik = nastavnik.sifNastavnik
+            	AND datumZaposlenDo IS NOT NULL
+    WHERE 
+    	akGodina = 2022 AND oznGrupa LIKE 'A%';
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+7.ZAD
+Ispisati jmbag, ime, prezime, šifru predmeta i ocjenu za svakog studenta i predmet za koje vrijedi da je student akademske godine 2019./2020. iz tog 
+predmeta dobio pozitivnu ocjenu takvu da niti jedan drugi student nije uspio dobiti veću ocjenu iz tog predmeta te akademske godine. Ispisati samo one 
+studente čiji je ukupni prosjek ocjena manji od 4.
+
+Napomena: U prosjek ulaze samo pozitivne ocjene.
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT ispit.JMBAG, student.imeStudent, student.prezimeStudent, ispit.sifPredmet, ispit.ocjena
+	FROM ispit NATURAL JOIN student
+    WHERE (datumIspit BETWEEN DATE '01.10.2019' AND DATE '30.09.2020')
+    	AND (4 > (SELECT AVG(i2.ocjena)
+                	FROM ispit i2
+                	WHERE i2.JMBAG = ispit.JMBAG AND i2.ocjena > 1
+                	GROUP BY i2.JMBAG) )
+        AND (ocjena = (SELECT MAX(i3.ocjena)
+                      	FROM ispit i3
+                      	WHERE (i3.datumispit BETWEEN DATE '01.10.2019' AND DATE '30.09.2020')
+                      		AND ispit.sifPredmet = i3.sifPredmet))
+        AND (ocjena > 1);
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+8.ZAD
+Za svaku županiju kojoj naziv počinje slovom "V" ispisati šifru i naziv županije te nazive organizacijskih jedinica čiji nastavnici-zaposlenici stanuju u 
+toj županiji, a ime im počinje s "D". U ispisu se moraju pojaviti i podaci o županijama u kojima ne stanuju zaposlenici čije ime počinje slovom "D" (u tom 
+slučaju za naziv organizacijske jedinice navodi se NULL). Eliminirati višestruke n-torke. 
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT DISTINCT zupanija.sifZupanija, nazZupanija, nazOrgJed
+	FROM zupanija
+    	LEFT JOIN mjesto
+        	ON zupanija.sifZupanija = mjesto.sifZupanija
+    	LEFT JOIN nastavnik
+        	ON mjesto.pBr = nastavnik.pBrStanNastavnik
+            	AND imeNastavnik LIKE 'D%'
+        LEFT JOIN orgjed
+        	ON orgjed.sifOrgJed = nastavnik.sifOrgJed
+    WHERE nazZupanija LIKE 'V%';
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+9.ZAD
+Za relaciju predmet kreirati najmanji mogući broj indeksa koji će omogućiti efikasno obavljanje svih navedenih upita:
+
+SELECT * FROM predmet WHERE nazPredmet = 'Baze podataka';
+SELECT * FROM predmet WHERE ECTSBod > 2 and ECTSBod < 7;
+SELECT * FROM predmet ORDER BY ECTSBod DESC, ukBrSatiTjedno DESC;
+SELECT * FROM predmet ORDER BY nazPredmet, ECTSBod DESC;
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+CREATE INDEX idx_ECTSBod_ukBrSatiTjedno ON predmet (ECTSBod DESC, ukBrSatiTjedno DESC);
+CREATE INDEX idx_nazPredmet_ECTSBod ON predmet (nazPredmet, ECTSBod DESC);
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+10.ZAD
+Za relaciju student kreirati najmanji mogući broj indeksa koji će omogućiti efikasno obavljanje svih navedenih upita:
+
+SELECT * FROM student 
+WHERE datumRod > '01.01.1997' 
+ORDER BY datumRod;
+
+SELECT * FROM student 
+WHERE prezimeStudent = 'Salopek' 
+   AND imeStudent = 'Krešimir';
+
+SELECT * FROM student WHERE prezimeStudent = 'Salopek';
+
+SELECT * FROM student ORDER BY prezimeStudent, imeStudent;
+
+SELECT * FROM student WHERE datumRod > '01.01.1997';
+
+SELECT * FROM student ORDER BY datumRod, jmbag;
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+CREATE INDEX idx_prezimeImeStudent ON student (prezimeStudent, imeStudent);
+
+CREATE INDEX idx_datumRod_jmbag ON student (datumRod, jmbag);
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+11.ZAD
+Primarni ključ u relaciji predmetGrupa je skup atributa: {sifPredmet, akGodina, oznGrupa}. Jednom SQL naredbom osigurajte entitetski integritet i 
+integritet ključa u toj relaciji. Također osigurati referencijski integritet među relacijama upisanPredmet i predmetGrupa.
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+ALTER TABLE predmetGrupa ADD CONSTRAINT plavaKrv PRIMARY KEY (sifPredmet, akGodina, oznGrupa);
+
+
+
+ALTER TABLE upisanPredmet ADD CONSTRAINT TuTuTu FOREIGN KEY (sifPredmet, akGodina, oznGrupa) REFERENCES predmetGrupa(sifPredmet, akGodina, oznGrupa);
+
+
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+12.ZAD
+Ispisati podatke o praznim predmetnim grupama iz akademske godine 2020./2021. ( ispisati: naziv predmeta, oznaku grupe, akademsku godinu i šifru nastavnika). Prazne predmetne grupe su one predmetne grupe kojima (te akademske godine) nije bio pridijeljen niti jedan student. U obzir uzeti samo one predmete kojima je te akademske godine bilo pridijeljeno više od jednog nastavnika.
+
+Primjer rezultata:
+
+nazPredmet	ozngrupa	akgodina	sifnastavnik
+Logička algebra	D-B2	2020	570
+Logička algebra	D-B3	2020	590
+Vještine komuniciranja	D-A5	2020	480
+...	...	...	...
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+SELECT DISTINCT nazPredmet, predmetGrupa.oznGrupa, predmetGrupa.akGodina, sifNastavnik
+	FROM predmetGrupa
+    	NATURAL JOIN nastavnik
+        LEFT JOIN upisanPredmet
+        	ON predmetGrupa.sifPredmet = upisanPredmet.sifPredmet
+            	AND predmetGrupa.akGodina = upisanPredmet.akGodina
+        LEFT JOIN predmet
+        	ON predmetGrupa.sifPredmet = predmet.sifPredmet
+    WHERE predmetGrupa.akGodina = 2020
+    	AND (SELECT COUNT(DISTINCT jmbag)
+            	FROM upisanPredmet up2
+            	WHERE up2.akGodina=2020 
+            		AND up2.sifPredmet = predmetGrupa.sifPredmet
+            		AND up2.oznGrupa = predmetGrupa.oznGrupa) = 0
+        AND (SELECT COUNT(DISTINCT sifNastavnik)
+            	FROM predmetGrupa pg2
+            	WHERE pg2.akGodina=2020 
+            		AND pg2.sifPredmet = predmetGrupa.sifPredmet) > 1
+ | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
