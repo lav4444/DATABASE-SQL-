@@ -1,5 +1,7 @@
-In this repository I'm sharing codes that were part of Introduction to Theoretical Computer Science subject at my 
+In this repository I'm sharing codes that were part of Databases subject at my 
 collage (Zagreb Faculty of Electrical Engineering and Computing).
+
+Mostly using PostgreSQL
 
 Database architecture and data independence, Relational data models
 Relational data models, Relational algebra and relational calculus
